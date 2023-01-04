@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class JdbcTemplate {
-	public void executeUpdate(User user, String sql, PreparedStatementSetter pss) throws SQLException {
+	public void executeUpdate(String sql, PreparedStatementSetter pss) throws SQLException {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		
@@ -29,7 +29,7 @@ public class JdbcTemplate {
 		}
 	}
 	
-	public User executeUpdate(String userId, String sql, PreparedStatementSetter pss, RowMapper rowMapper) throws SQLException {
+	public Object executeUpdate(String sql, PreparedStatementSetter pss, RowMapper rowMapper) throws SQLException {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -41,17 +41,12 @@ public class JdbcTemplate {
 			pss.setter(pstmt);
 			
 			rs = pstmt.executeQuery();
-			User user = null;
-			
+			Object obj = null;
 			if (rs.next()) {
-				user = new User(
-					rs.getString("userId"),
-					rs.getString("password"),
-					rs.getString("name"),
-					rs.getString("email")
-				);
+				return rowMapper.map(rs);
 			}
-			return user;
+			return obj;
+			
 		} finally {
 			if (rs != null) {
 				rs.close();
